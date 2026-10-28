@@ -12,7 +12,46 @@ import {
   AuditLogItem,
 } from '../types';
 
-const API_BASE = '/api/v1';
+const rawEnvUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+
+export const API_BASE = rawEnvUrl
+  ? rawEnvUrl.endsWith('/api/v1')
+    ? rawEnvUrl
+    : rawEnvUrl.endsWith('/api')
+      ? `${rawEnvUrl}/v1`
+      : `${rawEnvUrl}/api/v1`
+  : '/api/v1';
+
+export const getMediaUrl = (url?: string): string => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+    return url;
+  }
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return rawEnvUrl ? `${rawEnvUrl}${cleanPath}` : cleanPath;
+};
+
+// Resilient fetch wrapper: detects network drop / cold starts and provides actionable feedback
+const safeFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  try {
+    return await window.fetch(input, init);
+  } catch (err: any) {
+    const isNetworkError =
+      err?.name === 'TypeError' ||
+      err?.message?.includes('fetch') ||
+      err?.message?.includes('NetworkError') ||
+      err?.message?.includes('Failed to fetch');
+
+    if (isNetworkError) {
+      throw new Error(
+        'Unable to connect to the server. The backend service may be waking up (Render free tier cold start) or temporarily unreachable. Please wait a few moments and try again.'
+      );
+    }
+    throw err;
+  }
+};
+
+const fetch = safeFetch;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('weengineers_token');
@@ -23,9 +62,14 @@ const getAuthHeaders = () => {
 };
 
 async function handleResponse<T>(res: Response): Promise<T> {
-  const data = await res.json();
+  let data: any;
+  try {
+    data = await res.json();
+  } catch {
+    data = { message: `Request finished with HTTP ${res.status} (${res.statusText || 'Response Parse Error'})` };
+  }
   if (!res.ok) {
-    throw new Error(data.message || 'An error occurred during request processing.');
+    throw new Error(data.message || `Request failed with status: ${res.status}`);
   }
   return data;
 }

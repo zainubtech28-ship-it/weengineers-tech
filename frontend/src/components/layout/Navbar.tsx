@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogoBadge } from '../ui/LogoBadge';
 import {
   Menu,
@@ -11,16 +11,18 @@ import {
   Briefcase,
   Layers,
   Sparkles,
-  PhoneCall,
   Search,
+  Star,
+  Users,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const Navbar: React.FC = () => {
+export const Navbar: React.FC<{ onOpenTracker?: () => void }> = ({ onOpenTracker }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [moreDropdown, setMoreDropdown] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, isFounder, isAdmin } = useAuth();
 
   useEffect(() => {
@@ -36,96 +38,119 @@ export const Navbar: React.FC = () => {
     setMoreDropdown(false);
   }, [location.pathname]);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Services', path: '/services' },
-    { name: 'Projects', path: '/projects' },
-    { name: 'Case Studies', path: '/case-studies' },
-    { name: 'About', path: '/about' },
-    { name: 'Team', path: '/team' },
-    { name: 'Reviews', path: '/reviews' },
-    { name: 'Contact', path: '/contact' },
+  // Exact 5 Navigation Labels per Task Specification
+  const navItems = [
+    { label: 'WHAT ARE WE', sectionId: 'what-are-we', fallbackPath: '/' },
+    { label: 'WHO ARE WE', sectionId: 'who-are-we', fallbackPath: '/about' },
+    { label: 'WHAT WE DO', sectionId: 'what-we-do', fallbackPath: '/services' },
+    { label: 'OUR PROJECTS', sectionId: 'our-projects', fallbackPath: '/projects' },
   ];
 
+  const handleNavClick = (sectionId: string, fallbackPath: string) => {
+    setIsOpen(false);
+    if (location.pathname === '/') {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    navigate(`/#${sectionId}`);
+  };
+
   const moreLinks = [
-    { name: 'Our Process', path: '/process', icon: Layers },
-    { name: 'Industries We Serve', path: '/industries', icon: Briefcase },
-    { name: 'Request a Quote / Pricing', path: '/pricing', icon: Sparkles },
-    { name: 'Insights & Blog', path: '/blog', icon: Search },
-    { name: 'FAQ', path: '/faq', icon: PhoneCall },
+    { name: 'Services Directory', path: '/services', icon: Layers },
+    { name: 'Projects Archive', path: '/projects', icon: Briefcase },
+    { name: 'Company & Team', path: '/about', icon: Users },
+    { name: 'Engineering Process', path: '/process', icon: Sparkles },
+    { name: 'Client Reviews', path: '/reviews', icon: Star },
   ];
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/80 py-3.5'
-          : 'bg-white/80 backdrop-blur-sm border-b border-slate-100 py-4.5'
+          ? 'bg-[#07070a]/90 backdrop-blur-md border-b border-[#2e2614] py-3.5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+          : 'bg-[#07070a]/75 backdrop-blur-sm border-b border-[#2e2614]/70 py-4.5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo Badge with genuine LOGO.jpeg */}
+          {/* Logo Brand */}
           <LogoBadge variant="navbar" />
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2">
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
-              return (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-brand-600 bg-brand-50/80 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
+          {/* Desktop Navigation Links (The Exact 5 Labels) */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Main Navigation">
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleNavClick(item.sectionId, item.fallbackPath)}
+                className="px-3.5 py-2 rounded-full text-[13px] font-semibold text-[#a29c8c] hover:text-[#e8b84a] hover:bg-[#131318] transition-all duration-200 tracking-wider cursor-pointer"
+              >
+                {item.label}
+              </button>
+            ))}
 
-            {/* "More" Dropdown */}
+            {/* "More" Directory Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setMoreDropdown(!moreDropdown)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1 transition-colors ${
-                  moreDropdown ? 'text-brand-600 bg-brand-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                className={`px-3 py-2 rounded-full text-[13px] font-semibold flex items-center gap-1 transition-all duration-200 cursor-pointer ${
+                  moreDropdown
+                    ? 'text-[#e8b84a] bg-[#131318]'
+                    : 'text-[#a29c8c] hover:text-[#e8b84a] hover:bg-[#131318]'
                 }`}
+                aria-expanded={moreDropdown}
               >
-                More <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreDropdown ? 'rotate-180' : ''}`} />
+                MORE <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${moreDropdown ? 'rotate-180 text-[#e8b84a]' : ''}`} />
               </button>
 
               {moreDropdown && (
                 <div
-                  className="absolute top-full right-0 mt-2 w-56 bg-white rounded-2xl shadow-elevated border border-slate-200/80 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                  className="absolute top-full right-0 mt-2 w-60 bg-[#0d0d11] rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.7)] border border-[#2e2614] p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
                   onMouseLeave={() => setMoreDropdown(false)}
                 >
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#e8b84a]">
+                    Explore WEENGINEERS TECH
+                  </div>
                   {moreLinks.map((item) => (
                     <Link
                       key={item.name}
                       to={item.path}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50 transition-colors"
+                      onClick={() => setMoreDropdown(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#f4efe4] hover:text-[#e8b84a] hover:bg-[#131318] transition-colors"
                     >
-                      <item.icon className="w-4 h-4 text-slate-400 group-hover:text-brand-600" />
+                      <item.icon className="w-3.5 h-3.5 text-[#e8b84a]/80" />
                       {item.name}
                     </Link>
                   ))}
-                  <div className="my-1.5 border-t border-slate-100" />
+                  {onOpenTracker && (
+                    <button
+                      onClick={() => {
+                        setMoreDropdown(false);
+                        onOpenTracker();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#f4efe4] hover:text-[#e8b84a] hover:bg-[#131318] transition-colors text-left cursor-pointer"
+                    >
+                      <Search className="w-3.5 h-3.5 text-[#e8b84a]" />
+                      Track Existing Enquiry
+                    </button>
+                  )}
+                  <div className="my-1.5 border-t border-[#2e2614]" />
                   <Link
                     to="/admin/login"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-50 transition-colors"
+                    onClick={() => setMoreDropdown(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#a29c8c] hover:text-[#e8b84a] hover:bg-[#131318] transition-colors"
                   >
-                    <Shield className="w-4 h-4 text-brand-500" />
+                    <Shield className="w-3.5 h-3.5 text-[#e8b84a]" />
                     Administrator Portal
                   </Link>
                   <Link
                     to="/founder/login"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-700 hover:text-amber-800 hover:bg-amber-50/60 transition-colors"
+                    onClick={() => setMoreDropdown(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#f5c342] hover:text-[#fff2c4] hover:bg-[#1a1508] transition-colors"
                   >
-                    <Crown className="w-4 h-4 text-amber-500" />
+                    <Crown className="w-3.5 h-3.5 text-[#e8b84a]" />
                     Founder Portal
                   </Link>
                 </div>
@@ -133,104 +158,113 @@ export const Navbar: React.FC = () => {
             </div>
           </nav>
 
-          {/* Desktop Right Action Area */}
+          {/* Desktop Right Action Area: CONTACT US CTA */}
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <Link
                 to={isFounder ? '/founder/dashboard' : '/admin/dashboard'}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#131318] text-[#f4efe4] border border-[#2e2614] text-xs font-semibold hover:border-[#e8b84a] transition-colors"
               >
-                {isFounder ? <Crown className="w-3.5 h-3.5 text-amber-400" /> : <Shield className="w-3.5 h-3.5 text-brand-400" />}
+                {isFounder ? <Crown className="w-3.5 h-3.5 text-[#e8b84a]" /> : <Shield className="w-3.5 h-3.5 text-[#e8b84a]" />}
                 {isFounder ? 'Founder Console' : 'Admin Console'}
               </Link>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/admin/login"
-                  title="Administrator Portal"
-                  className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                >
-                  <Shield className="w-4 h-4" />
-                </Link>
-                <Link
-                  to="/founder/login"
-                  title="Founder Portal"
-                  className="p-2 rounded-xl text-amber-600 hover:text-amber-700 hover:bg-amber-50 transition-colors"
-                >
-                  <Crown className="w-4 h-4" />
-                </Link>
-              </div>
-            )}
+            ) : null}
 
-            <Link
-              to="/contact"
-              className="btn-primary py-2.5 px-5 text-xs font-semibold shadow-sm"
+            {/* CONTACT US (Primary Gold CTA) */}
+            <button
+              onClick={() => handleNavClick('contact-us', '/contact')}
+              className="btn-gold text-[13px] tracking-wider py-2 px-5 font-bold cursor-pointer"
             >
-              Start Your Project
+              CONTACT US
               <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-2 lg:hidden">
-            <Link
-              to="/contact"
-              className="btn-primary py-2 px-3 text-xs font-medium"
-            >
-              Enquire
-            </Link>
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 focus:outline-none"
-              aria-label="Toggle navigation menu"
+              onClick={() => handleNavClick('contact-us', '/contact')}
+              className="btn-gold py-1.5 px-3.5 text-xs font-bold"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              CONTACT US
+            </button>
+            <button
+              id="mb"
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-xl text-[#f4efe4] border border-[#2e2614] bg-[#0d0d11] hover:border-[#e8b84a] focus:outline-none transition-colors"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isOpen}
+            >
+              {isOpen ? <X className="w-6 h-6 text-[#e8b84a]" /> : <Menu className="w-6 h-6 text-[#f4efe4]" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Drawer */}
       {isOpen && (
-        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 shadow-xl animate-in fade-in slide-in-from-top-4 duration-200">
-          <div className="flex flex-col space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className="px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50"
+        <div className="lg:hidden bg-[#0d0d11] border-b border-[#2e2614] px-5 pt-4 pb-7 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="flex flex-col space-y-1.5">
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleNavClick(item.sectionId, item.fallbackPath)}
+                className="w-full text-left px-3.5 py-3 rounded-xl text-sm font-semibold tracking-wider text-[#f4efe4] hover:text-[#e8b84a] hover:bg-[#131318] transition-colors"
               >
-                {link.name}
-              </Link>
+                {item.label}
+              </button>
             ))}
 
-            <div className="pt-2 pb-1 border-t border-slate-100 text-xs font-semibold uppercase tracking-wider text-slate-400 px-3">
+            <button
+              onClick={() => handleNavClick('contact-us', '/contact')}
+              className="w-full text-left px-3.5 py-3 rounded-xl text-sm font-bold tracking-wider text-[#e8b84a] hover:bg-[#131318] transition-colors"
+            >
+              CONTACT US
+            </button>
+
+            <div className="pt-3 pb-1 border-t border-[#2e2614] text-[11px] font-bold uppercase tracking-widest text-[#a29c8c] px-3">
               Explore More
             </div>
             {moreLinks.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-slate-600 hover:text-brand-600 hover:bg-slate-50"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#a29c8c] hover:text-[#e8b84a] hover:bg-[#131318]"
               >
-                <item.icon className="w-4 h-4 text-slate-400" />
+                <item.icon className="w-4 h-4 text-[#e8b84a]" />
                 {item.name}
               </Link>
             ))}
 
-            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+            {onOpenTracker && (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  onOpenTracker();
+                }}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#a29c8c] hover:text-[#e8b84a] hover:bg-[#131318] text-left"
+              >
+                <Search className="w-4 h-4 text-[#e8b84a]" />
+                Track Existing Enquiry
+              </button>
+            )}
+
+            <div className="pt-3 border-t border-[#2e2614] flex flex-col gap-2">
               <Link
                 to="/admin/login"
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 text-slate-700 text-xs font-medium border border-slate-200"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#131318] text-[#f4efe4] text-xs font-medium border border-[#2e2614] hover:border-[#e8b84a]"
               >
-                <Shield className="w-4 h-4 text-brand-600" />
+                <Shield className="w-4 h-4 text-[#e8b84a]" />
                 Administrator Portal
               </Link>
               <Link
                 to="/founder/login"
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a1508] text-[#e8b84a] text-xs font-semibold border border-[#a87a1c]/40 hover:border-[#e8b84a]"
               >
-                <Crown className="w-4 h-4 text-amber-600" />
+                <Crown className="w-4 h-4 text-[#e8b84a]" />
                 Founder Portal
               </Link>
             </div>

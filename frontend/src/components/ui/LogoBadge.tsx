@@ -20,12 +20,15 @@ export const LogoBadge: React.FC<LogoBadgeProps> = ({
 
   const logoImg = (
     <div
-      className={`relative flex items-center justify-center rounded-xl bg-slate-950 border border-amber-500/30 shadow-sm overflow-hidden flex-shrink-0 transition-transform duration-300 hover:scale-105 ${
+      className={`relative flex items-center justify-center rounded-xl bg-[#07070a] border border-[#a87a1c]/50 shadow-sm overflow-hidden flex-shrink-0 transition-transform duration-300 group-hover:scale-105 ${
         isHero ? 'w-14 h-14' : isPortal ? 'w-10 h-10' : isCompact ? 'w-9 h-9' : 'w-11 h-11'
       }`}
     >
       <img
-        src="/LOGO.jpeg"
+        src="/hero/logo.png"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src = '/LOGO.jpeg';
+        }}
         alt="WEENGINEERS TECH Official Logo"
         className="w-full h-full object-contain p-0.5"
       />
@@ -34,24 +37,24 @@ export const LogoBadge: React.FC<LogoBadgeProps> = ({
 
   const textContent = (
     <div className="flex flex-col text-left">
-      <div className="flex items-center gap-1.5 leading-none">
-        <span className="font-heading font-extrabold tracking-tight text-slate-900 text-base md:text-lg">
+      <div className="flex items-center tracking-wide leading-none font-bold text-sm md:text-base">
+        <span className="text-[#ececf1] font-bold tracking-wider">
           WEENGINEERS
         </span>
-        <span className="font-heading font-extrabold tracking-wider text-brand-600 text-xs md:text-sm px-1.5 py-0.5 rounded bg-brand-50 border border-brand-100">
+        <b className="gold font-extrabold ml-0.5 text-base md:text-lg">
           TECH
-        </span>
+        </b>
       </div>
       {showTagline && (
-        <span className="text-[9px] md:text-[10px] tracking-widest uppercase font-semibold text-slate-400 mt-1">
-          Beyond Expectations
+        <span className="text-[9px] md:text-[10px] tracking-widest uppercase font-medium text-[#a29c8c] mt-1">
+          Engineering Ideas Into Impact
         </span>
       )}
     </div>
   );
 
   const content = (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-2.5 ${className}`}>
       {logoImg}
       {!isCompact && textContent}
     </div>
@@ -59,7 +62,7 @@ export const LogoBadge: React.FC<LogoBadgeProps> = ({
 
   if (linkTo) {
     return (
-      <Link to={linkTo} className="inline-flex items-center group">
+      <Link to={linkTo} className="inline-flex items-center group transition-opacity hover:opacity-95">
         {content}
       </Link>
     );

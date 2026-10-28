@@ -78,21 +78,21 @@ export const ServicesPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-28 pb-20">
+    <div className="pt-28 pb-20 bg-[#07070a] text-[#f4efe4] min-h-screen">
       {/* Header */}
-      <section className="bg-slate-50/70 border-b border-slate-200/70 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
-          <span className="badge-primary mb-3">Enterprise Offerings</span>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
-            Our Core Engineering Services
+      <section className="border-b border-[#2e2614] py-16 bg-[#07070a]">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <span className="lbl mb-2">WHAT WE DO</span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4">
+            Technology Built Around <span className="gold">Your Vision</span>
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Twelve specialized technical disciplines engineered to build, scale, and secure your digital ventures beyond expectations.
+          <p className="text-[#a29c8c] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+            From the first idea to a scalable production-ready solution, we engineer digital products designed for real-world impact.
           </p>
 
           {/* Search Bar */}
           <div className="mt-8 max-w-md mx-auto relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+            <Search className="w-4 h-4 text-[#a29c8c] absolute left-3.5 top-3.5" />
             <input
               type="text"
               placeholder="Search by service or technology (e.g. React, MongoDB)..."
@@ -105,25 +105,25 @@ export const ServicesPage: React.FC = () => {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="py-16 bg-[#0d0d11]">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredServices.map((service) => (
               <div
                 key={service._id}
-                className="card-light p-6 md:p-8 flex flex-col justify-between hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
+                className="card-gold p-6 md:p-8 flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100 mb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-[#07070a] text-[#e8b84a] flex items-center justify-center border border-[#2e2614] mb-6">
                     {getServiceIcon(service.title)}
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{service.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed mb-6">{service.shortDescription}</p>
+                  <h3 className="text-xl font-bold text-[#f4efe4] mb-2">{service.title}</h3>
+                  <p className="text-xs text-[#a29c8c] leading-relaxed mb-6">{service.shortDescription}</p>
 
                   <div className="space-y-2 mb-6">
                     {service.benefits?.slice(0, 3).map((benefit, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
-                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <div key={i} className="flex items-start gap-2 text-xs text-[#f4efe4]">
+                        <CheckCircle className="w-3.5 h-3.5 text-[#e8b84a] flex-shrink-0 mt-0.5" />
                         <span>{benefit}</span>
                       </div>
                     ))}
@@ -131,26 +131,26 @@ export const ServicesPage: React.FC = () => {
 
                   <div className="flex flex-wrap gap-1.5 mb-6">
                     {service.technologies?.map((tech) => (
-                      <span key={tech} className="px-2 py-0.5 rounded bg-slate-100 text-[10px] text-slate-600 font-medium">
+                      <span key={tech} className="px-2 py-0.5 rounded border border-[#2e2614] bg-[#07070a] text-[10px] text-[#a29c8c] font-medium">
                         {tech}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <div className="pt-4 border-t border-[#2e2614] flex items-center justify-between">
                   <Link
                     to={`/services/${service.slug}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-800"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8b84a] hover:underline"
                   >
                     View Specifications <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
 
                   <Link
-                    to="/contact"
-                    className="text-xs text-slate-500 hover:text-slate-800 font-medium"
+                    to="/#contact-us"
+                    className="text-xs text-[#a29c8c] hover:text-[#e8b84a] font-medium"
                   >
-                    Enquire
+                    Discuss this →
                   </Link>
                 </div>
               </div>
@@ -158,9 +158,9 @@ export const ServicesPage: React.FC = () => {
           </div>
 
           {filteredServices.length === 0 && (
-            <div className="text-center py-16 card-light max-w-md mx-auto">
-              <p className="text-sm text-slate-500">No services match your search criteria.</p>
-              <button onClick={() => setSearch('')} className="btn-secondary text-xs mt-3">
+            <div className="text-center py-16 card-gold max-w-md mx-auto p-8">
+              <p className="text-sm text-[#a29c8c]">No services match your search criteria.</p>
+              <button onClick={() => setSearch('')} className="btn-gold-outline text-xs mt-3">
                 Clear Filters
               </button>
             </div>
